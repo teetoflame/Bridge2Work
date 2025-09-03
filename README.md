@@ -3,16 +3,22 @@
 # Bridge2Work – ShopEdge Deployment
 
 Bridge2Work/
+
   ├── Dockerfile
+  
   ├── README.md
+  
   ├── app/
   │    └── main.py
+  
   ├── k8s/
   │    ├── deployment.yaml
   │    └── service.yaml
+  
   ├── terraform/
   │    ├── main.tf
   │    └── variables.t
+  
   ├── .github/
   │    └── workflows/
   │         └── ci-cd.ym
