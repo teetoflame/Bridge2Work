@@ -9,18 +9,25 @@ Bridge2Work/
   ├── README.md
   
   ├── app/
+  
   │    └── main.py
   
   ├── k8s/
+  
   │    ├── deployment.yaml
+  
   │    └── service.yaml
   
   ├── terraform/
+  
   │    ├── main.tf
+  
   │    └── variables.t
   
   ├── .github/
+  
   │    └── workflows/
+  
   │         └── ci-cd.ym
 
 
