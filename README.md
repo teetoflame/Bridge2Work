@@ -32,29 +32,45 @@ Bridge2Work/
 
 
 1. Infrastructure (Terraform)
-Used Terraform to define the cloud infrastructure environments for ShopEdge:
-VPC (10.0.0.0/16): The private network for all resources.
-2 Subnets (us-east-1a & us-east-1b): To distribute resources across availability zones.
-Internet Gateway + Routing: Enables public access for compute resources.
-EC2 Instances: Two virtual machines (one in each subnet) for hosting applications.
-RDS Instances: Two MySQL databases (one in each subnet) for persistent storage.
-EKS Clusters: Two Kubernetes clusters (each spanning both subnets) for containerized workloads.
-Security Groups: Control access—SSH/HTTP for EC2, restricted DB access for RDS, and dedicated SGs for EKS.
-This ensures a scalable, multi-AZ architecture with networking, compute, databases, and container orchestration fully defined as code.
+I used Terraform to define all the cloud resources needed for this project. This approach makes the entire infrastructure versionable and repeatable. You can see the full code in the terraform/ directory.
 
-2. Application (FastAPI)
-Built a lightweight FastAPI web application to demonstrate deployment. The app simply displays a welcome message — “Hello from ShopEdge App”. It was containerized with Docker for portability and deployed to Kubernetes (EKS) for scalability and orchestration.
+Here's what I set up:
 
-3. CI/CD (GitHub Actions)
-Implemented a GitHub Actions workflow to automate the application lifecycle:
-Trigger – Runs whenever code is pushed to the main branch.
-Build – Builds a Docker image from the FastAPI application source.
-Push – Authenticates to Docker Hub using GitHub Secrets and pushes the image.
-Deploy – Applies the Kubernetes manifest files (deployment.yaml, service.yaml) to the EKS cluster using kubectl.
-Versioning – The Docker image tag is automatically updated with the Git commit SHA, ensuring each build is uniquely identifiable.
-Secrets Management – Sensitive data (Docker credentials, Kubernetes config) is stored securely in GitHub Secrets, never exposed in code
-## 4. How to Run Locally
-```bash
+VPC and Networking: A dedicated private network (10.0.0.0/16) with two subnets spread across two different Availability Zones (us-east-1a and us-east-1b) for high availability. An Internet Gateway provides public access.
+
+Security: I created specific Security Groups to act as firewalls for each type of resource. For example, the web servers can talk to the databases, but the databases are not open to the public internet.
+
+Compute: I provisioned two EC2 Instances (virtual machines) to act as general-purpose servers, one in each subnet.
+
+Database: For data storage, I created two RDS (MySQL) database instances, also one in each subnet.
+
+Container Orchestration: For a scalable application environment, I provisioned two EKS Clusters (Kubernetes), one in each subnet. This is where our application will run.
+
+2. CI/CD (GitHub Actions)
+I built a simple but effective CI/CD pipeline using GitHub Actions. This workflow automatically builds and deploys the application every time code is pushed to the main branch.
+
+The pipeline performs three key steps:
+
+Build: It takes the application code from app/ and the Dockerfile to build a new Docker image.
+
+Push: It logs into Docker Hub using credentials stored securely in GitHub Secrets and pushes the newly created image.
+
+Deploy: It connects to the EKS cluster and applies the Kubernetes manifest files from the k8s/ directory to deploy the application. Each deployment is tagged with the unique Git commit SHA, so we always know exactly which version is running.
+
+3. Application (FastAPI)
+The application itself is a very simple web service built with FastAPI. It just returns a friendly "Hello from ShopEdge App" message. The purpose of this app is to serve as a practical example to demonstrate the Dockerization and Kubernetes deployment process.
+
+How to Run Locally
+If you'd like to test the application on your own machine, you can easily build and run the Docker image.
+
+Build the Docker image:
+
+Bash
+
 docker build -t shopedge-app .
+Run the container on your local machine:
+
+Bash
+
 docker run -p 80:80 shopedge-app
-# Bridge2Work
+Open your web browser and navigate to http://localhost. You should see the welcome message!
